@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>CV Builder | Universal CV ID</title>
+<meta name="description" content="Free online CV builder. Build, tailor and download your CV as PDF or Word, and track your job applications. No sign-up.">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<script src="assets/boot.js?v=42"></script>
+<link rel="stylesheet" href="assets/fonts/fonts.css?v=42">
+<link rel="stylesheet" href="assets/styles.css?v=42">
+<link rel="stylesheet" href="assets/shell.css?v=42">
+<script src="assets/vendor/lz-string.min.js?v=42"></script>
+<script src="assets/vendor/qrcode.min.js?v=42"></script>
+<script src="assets/vendor/jspdf.umd.min.js?v=42"></script>
+</head>
+<body>
+  <aside class="side" id="side" aria-label="App navigation"></aside>
+  <header class="app-bar">
+    <div class="app-bar-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Universal CV ID<span class="beta-tag">Beta</span></a>
+      <span class="save-state" id="saveState" aria-live="polite">Saved</span>
+      <span class="spacer"></span>
+      <div class="version-picker">
+        <button class="ver-chip" data-tab="home" title="Back to the dashboard"><span class="sw">← Dashboard</span><span class="eyebrow">Editing</span><b id="verName">Main CV</b></button>
+        <select id="versionSelect" class="sr" tabindex="-1" aria-hidden="true"></select>
+      </div>
+      <div class="modes" id="modes" role="tablist" aria-label="Mode"></div>
+      <div class="bar-actions">
+        <button class="btn btn-sm bar-share" data-tab="share" aria-label="Share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/><path d="M16 6l-4-4-4 4"/><path d="M12 2v13"/></svg><span>Share</span></button>
+        <span class="dl-split">
+          <button class="btn btn-sm btn-primary dl-main" data-action="download-main" aria-label="Download PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v13"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg><span>Download PDF</span></button><button class="btn btn-sm btn-primary dl-more" data-action="dl-menu" aria-label="More download options" aria-expanded="false" aria-controls="dlMenu">▾</button>
+          <span class="dl-menu" id="dlMenu" role="menu" hidden>
+            <button role="menuitem" data-action="docx">Word (.docx)</button>
+            <button role="menuitem" data-action="pdf">Plain-text PDF</button>
+            <button role="menuitem" data-action="export-json">JSON Resume</button>
+            <button role="menuitem" data-tab="letter">Cover letter…</button>
+            <button role="menuitem" data-tab="share">All download and share options…</button>
+          </span>
+        </span>
+      </div>
+      <a class="fb-link" href="https://tally.so/r/1A11el" target="_blank" rel="noopener" title="Give feedback: 2-minute anonymous survey" aria-label="Give feedback"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Feedback</span></a>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Main"></nav>
+    <nav class="subtabs" id="subtabs" role="tablist" aria-label="In this area" hidden></nav>
+  </header>
+
+  <div class="workspace">
+    <main id="panel" class="panel-col" role="tabpanel"></main>
+
+    <aside class="preview-col" aria-label="Live preview">
+      <div class="preview-bar">
+        <span class="eyebrow" id="pageCount">Live preview · A4</span>
+        <span class="fit-chip" id="fitChip" hidden></span>
+        <button class="btn btn-sm panel-toggle" data-action="toggle-panel">Hide panel</button>
+      </div>
+      <div class="paper-wrap" id="paperWrap"><div class="paper-scale" id="paper"></div></div>
+    </aside>
+  </div>
+
+  <button class="fab" id="previewFab" data-action="toggle-preview" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Preview</span></button>
+
+  <div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+  <script src="assets/cv.js?v=42"></script>
+  <script src="assets/hire-data.js?v=42"></script>
+  <script src="assets/hire.js?v=42"></script>
+  <script src="assets/board-data.js?v=42"></script>
+  <script src="assets/board.js?v=42"></script>
+  <script src="assets/pages.js?v=42"></script>
+  <script src="assets/app.js?v=42"></script>
+
+</body>
+</html>

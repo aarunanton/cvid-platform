@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Free CV Checker (Ireland &amp; UK) | Universal CV ID</title>
+<meta name="description" content="Free CV checker for Ireland and the UK. See what recruiters notice, marked on your own CV, with a reason for every fix. No sign-up, and your CV is never uploaded.">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#F4F2F0">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Universal CV ID">
+<meta property="og:title" content="Free CV checker | Universal CV ID">
+<meta property="og:description" content="Free CV checker for Ireland and the UK. See what recruiters notice, marked on your own CV, with a reason for every fix. No sign-up, and your CV is never uploaded.">
+<meta property="og:url" content="https://cvid.app/cv-checker.html">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Free CV checker | Universal CV ID">
+<meta name="twitter:description" content="Free CV checker for Ireland and the UK. See what recruiters notice, marked on your own CV, with a reason for every fix. No sign-up, and your CV is never uploaded.">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "operatingSystem": "Any (web browser)",
+ "browserRequirements": "Requires JavaScript",
+ "applicationCategory": "BusinessApplication",
+ "offers": {
+  "@type": "Offer",
+  "price": "0",
+  "priceCurrency": "EUR"
+ },
+ "name": "Universal CV ID CV checker",
+ "url": "https://cvid.app/cv-checker.html",
+ "description": "Free CV checker for Ireland and the UK. Marks what recruiters notice on your own CV, with a reason and a fix for each one. Your CV is read in your browser and never uploaded."
+}
+</script>
+<script src="assets/boot.js?v=42"></script>
+<link rel="stylesheet" href="assets/fonts/fonts.css?v=42">
+<link rel="stylesheet" href="assets/styles.css?v=42">
+<link rel="stylesheet" href="assets/shell.css?v=42">
+</head>
+<body>
+  <div class="h-dark h-dark-nav">
+  <nav class="r-nav" aria-label="Main">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true"></span>Universal CV ID<span class="beta-tag">Beta</span></a>
+    <div class="r-links">
+      <a href="cv-builder.html">CV builder</a>
+      <a href="cv-checker.html" class="nav-on" aria-current="page">CV checker</a>
+      <a href="employers.html">For companies</a>
+      <a href="app.html#find">Find jobs</a>
+      <a href="faq.html">FAQ</a>
+      <a href="blog/index.html">Blog</a>
+    </div>
+  </nav>
+  </div>
+  <main>
+  <header class="ph">
+    <span class="h-eyebrow">Beta · Free for Ireland and the UK</span>
+    <h1>Free CV checker</h1>
+    <p class="r-lede">See what a recruiter notices, marked on your own CV. Every fix tells you why, and what to add.</p>
+    <div class="ph-tool">
+    <label class="ck-drop" id="ckDrop" for="ckFileInput">
+      <span class="ck-up" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1919" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
+      <span><b>Drop your CV here, or choose a file</b><span>PDF or Word. Read in your browser, never uploaded.</span></span>
+      <input type="file" id="ckFileInput" accept=".pdf,.docx,.doc,.txt">
+    </label>
+    <div class="ck-more">
+      <button type="button" class="r-textlink" id="ckSample">Try it with an example CV</button>
+    </div>
+    <p class="ck-note" id="ckNote" role="status"></p>
+    <details class="ck-paste">
+      <summary>Paste your CV as text, or add a job advert</summary>
+      <form id="ckPasteForm">
+        <label for="ckText">Your CV<textarea id="ckText" spellcheck="false" placeholder="Paste the text of your CV"></textarea></label>
+        <label for="ckAd">Job advert (optional)<textarea id="ckAd" spellcheck="false" placeholder="Paste the job advert to check your CV against it"></textarea></label>
+        <div class="ck-pasterow"><button class="btn btn-primary" type="submit">Check</button><label for="ckHasPhoto"><input type="checkbox" id="ckHasPhoto"> My CV has a photo</label></div>
+      </form>
+    </details>
+    </div>
+  </header>
+  <section class="ck" id="ckReport" hidden aria-label="Your CV report">
+    <div class="ck-bar">
+      <h2>Your CV report</h2>
+      <span class="ck-file" id="ckFile"></span>
+      <span class="sp"></span>
+      <label for="ckRegion">Applying in
+        <select id="ckRegion"><option value="IE" selected>Ireland</option><option value="UK">the UK</option><option value="NA">the US or Canada</option><option value="EU">elsewhere in Europe</option><option value="OT">another country</option></select>
+      </label>
+      <button type="button" class="ck-again" id="ckAgain">Check another CV</button>
+    </div>
+    <div class="ck-grid">
+      <div class="ck-paper" id="ckPaper"></div>
+      <aside class="ck-side">
+        <div class="ck-card ck-summary" id="ckSummary"></div>
+        <div class="ck-card" id="ckGroups"></div>
+        <div class="ck-card ck-elig" id="ckElig"></div>
+        <p class="ck-foot">The CV check is in beta. If a fix looks wrong, <a href="https://tally.so/r/1A11el" target="_blank" rel="noopener">tell us</a>.</p>
+      </aside>
+    </div>
+  </section>
+  <section class="section r-section">
+    <h2 class="r-h2">What it looks for</h2>
+    <p class="intro">The things recruiters notice in the 10 to 20 seconds they spend on a CV, starting with your latest job.</p>
+    <div class="r-also">
+      <ul>
+        <li><b>Duties, not achievements</b><span>"Responsible for managing the booking system." We ask what got better because of you.</span></li>
+        <li><b>Buzzwords</b><span>"Hard-working team player", and phrases that sound AI-written.</span></li>
+        <li><b>Skills with no example</b><span>If Excel is in your skills list, show where you used it.</span></li>
+        <li><b>Missing basics</b><span>No email, no dates, no Skills section.</span></li>
+        <li><b>Layout and length</b><span>Walls of text, long bullets, mixed date styles.</span></li>
+        <li><b>The job advert</b><span>Paste one to see what it asks for that your CV doesn't show.</span></li>
+      </ul>
+    </div>
+  </section>
+  <section class="section r-section r-privacy">
+    <div><h2 class="r-h2">An honest review, not a fake score.</h2></div>
+    <ul>
+      <li>No "ATS score" to chase, just a short list of fixes.</li>
+      <li>Every fix says why. Dismiss any that don't fit you.</li>
+      <li>Nothing is made up. We only use what's in your CV.</li>
+    </ul>
+  </section>
+  <section class="section r-section">
+    <a class="next-link" href="cv-builder.html">Then fix it in the free CV builder</a>
+  </section>
+  </main>
+  <section class="site-close" aria-labelledby="closeT">
+    <h2 id="closeT">Build it. Check it. <em>Send it.</em></h2>
+    <p>Free, no sign-up. Your CV stays on your device.</p>
+    <div class="hm-btns">
+      <a class="hm-btn dark" href="app.html">Build my CV free</a>
+      <a class="hm-btn line" href="cv-checker.html">Check my CV free</a>
+    </div>
+  </section>
+  <footer class="site-foot">
+    <div class="site-foot-in">
+      <div class="sf-brand">
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Universal CV ID</a>
+        <p>Free tools for job seekers. Your CV is read in your browser and kept on your device.</p>
+      </div>
+      <nav aria-label="Tools"><h2>Tools</h2><a href="cv-builder.html">CV builder</a><a href="cv-checker.html">CV checker</a><a href="cv-checker.html#example">Example report</a><a href="app.html#find">Find jobs</a></nav>
+      <nav aria-label="Learn"><h2>Learn</h2><a href="index.html#how">How it works</a><a href="faq.html">What we check</a><a href="blog/index.html">Blog</a><a href="faq.html">FAQ</a></nav>
+      <nav aria-label="Project"><h2>Project</h2><a href="about.html">About and roadmap</a><a href="privacy.html">Data and privacy</a><a href="https://tally.so/r/1A11el" target="_blank" rel="noopener">Give feedback</a><a href="https://github.com/aarunanton/Universal-CVID" target="_blank" rel="noopener">GitHub</a></nav>
+    </div>
+    <div class="sf-base"><span>Open source under the MIT licence</span><span>Beta · Free for Ireland and the UK</span></div>
+  </footer>
+<script src="assets/check.js?v=42" defer></script>
+
+</body>
+</html>

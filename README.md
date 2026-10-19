@@ -1,0 +1,126 @@
+# Universal CV ID: platform (work in progress)
+
+Separate copy of the site with the two-sided platform (candidates and companies). Not indexed by search engines. The live CV builder at cvid.app is a different repo and is not affected by this one.
+
+Publish: repo Settings > Pages > Deploy from branch main, root. Careerjet search only works on cvid.app, so the "Search other boards" widget may not load here.
+
+# Universal CV ID
+
+**One ID. Every version of your career.**
+
+Import your CV or build it here, and get a permanent Universal CV ID (for example `#UCVID-K7Q4M`). Keep one master CV, tick what each job needs, check it against the advert, and send a matching PDF, Word file, link or QR code. Everything runs in the browser: no account, no server, no tracking.
+
+**Live site:** https://cvid.app
+
+---
+
+## Features
+
+| Feature | What it does |
+|---|---|
+| **Import** | Upload a PDF, Word (.docx), text or JSON Resume file, or paste text. Sections, roles, dates, bullets and skills are filled in for you to check. |
+| **Master CV with tick-boxes** | Everything you've done lives in one master CV. Each version ticks the roles, bullets and skills it shows; unticked items stay stored. |
+| **Versions** | Each version has its own title, profile, selection, design, target job and cover letter. All share one Universal CV ID. |
+| **Score** | Pass/fail checks across Content, Format, Best practices and Job match: 3–6 bullets per role, numbers in bullets, weak openers, pronouns, buzzwords, passive voice, word count, page length and more. |
+| **Job match** | Paste a job advert to get a keyword match score, see what's missing, add terms in one click, and save a tailored version. |
+| **Design** | Six templates (Meridian, Classic, Slate, Ledger, Compact, Plain ATS), five fonts, font size, line spacing, margins, section spacing, date format, accent colour, optional photo, section order and visibility. |
+| **Real A4 pages** | Long CVs flow across pages with page numbers; roles split cleanly between pages. |
+| **Exports** | PDF that matches the preview exactly (real text), Word (.docx), plain-text PDF and JSON Resume. |
+| **Cover letters** | One per version, drafted from the CV and the job advert, in the same design. PDF and Word. |
+| **Share** | A link with the CV compressed into it (no server), plus a short contact-card link with a QR code. |
+| **Application tracker** | Saved → Applied → Interview → Offer / Rejected, linked to the CV version sent. |
+| **Editing** | Drag to reorder bullets and sections, Enter for a new bullet, paste many lines as many bullets, `**bold**`, `*italic*` and `[links](https://…)`, custom sections. |
+| **Private** | All data lives in the browser's local storage. Light and dark mode. |
+
+Data saved by earlier versions of the builder is upgraded automatically.
+
+## Files
+
+```
+Universal-CVID/
+├── index.html        Landing page
+├── app.html          The builder
+├── p.html            Public profile page that opens shared links and QR codes
+├── assets/
+│   ├── cv.js         Engine: data model, A4 pagination, score, job match, import parser, sharing, exports
+│   ├── app.js        Builder interface
+│   ├── p.js          Public profile page logic
+│   ├── boot.js       Content security policy, loaded first on every page
+│   ├── styles.css    Design tokens (light and dark), builder and CV template styles
+│   ├── fonts/        Self-hosted fonts
+│   └── vendor/       Self-hosted libraries
+├── cv-builder.html   Redirect to app.html (keeps old links working)
+└── dashboard.html    Redirect to app.html#versions
+```
+
+Plain HTML, CSS and JavaScript with no build step. Every library and font ships inside this repository (`assets/vendor`, `assets/fonts`), so the site makes **no requests to any other server**: [lz-string](https://github.com/pieroxy/lz-string) (link compression), [qrcodejs](https://github.com/davidshimjs/qrcodejs) (QR codes), [jsPDF](https://github.com/parallax/jsPDF) (plain-text PDF), [PDF.js](https://mozilla.github.io/pdf.js/) (PDF import), [mammoth](https://github.com/mwilliamson/mammoth.js) (Word import) and [docx](https://github.com/dolanmiu/docx) (Word export).
+
+## Security and privacy
+
+- **No third parties.** No CDN, no Google Fonts, no analytics. A content security policy (`assets/boot.js`) blocks outside connections and injected scripts.
+- **Nothing from a link is trusted.** Shared links, imports and stored data are validated before display: design values are checked against known options, photos must be embedded images, and only `http(s)` links are made clickable.
+- **You choose what a link carries.** Email, phone and location can each be left out of shared links and the QR card. Phone is off by default. Photos are never included.
+- **Links can't be recalled.** A shared link contains the CV, so it can't be revoked once sent. The app says so before you copy it.
+- **IDs** are generated with the browser's cryptographic random source. They are not yet centrally registered, so uniqueness is not guaranteed until the planned backend.
+- **Self-declared.** Nothing on a CV or ID card is verified yet; shared pages say so.
+
+## Run locally
+
+```bash
+python -m http.server 8000
+# then open http://localhost:8000
+```
+
+## Known limits
+
+- Data is stored per browser, unencrypted. Use an export or a share link to move a CV between devices.
+- The site runs on its own domain (cvid.app), so its browser storage is not shared with other projects.
+- Import is a best guess. Two-column CVs and scanned (image-only) PDFs import poorly; paste the text instead.
+- "Download PDF" uses the browser's print window (choose "Save as PDF").
+- Job match and the cover-letter draft are rule-based and run on your device. They do not use AI.
+
+## Roadmap
+
+- Accounts and cloud sync, so an ID resolves to your latest CV from any device
+- Server-issued, longer IDs with a uniqueness check; revocable share links using random tokens separate from the ID
+- LinkedIn data-export import; company and role picked out of a pasted job advert
+- Verified claims: professional registers, universities, employers
+- AI rewriting of bullet points and summaries
+- View analytics for shared links
+
+## Licence
+
+MIT © Aarun Antony
+
+## v37
+
+- App shell with left navigation: Dashboard, Resumes, Job tracker, Find jobs, Cover letters, Contacts, Interviews, Resources.
+- Find jobs: live search through a small Cloudflare Worker (`worker/`, see its README to deploy), a paste-an-advert match check, and quick links to job boards. Match scoring runs in the browser.
+- Cream homepage, merged closing band and footer on every public page, privacy page updated for Find jobs.
+
+## Find jobs: widget mode (v38)
+Careerjet's API refused our Worker (403, "Unauthorized access from IP", Cloudflare IPs are shared and change), so Find jobs now embeds Careerjet's search box (`SEARCH_MODE = 'widget'` in assets/pages.js). To go back to our own search + fit scores, get a fixed IP approved by Careerjet, point the Worker at it, and set `SEARCH_MODE = 'api'`. CSP in assets/boot.js allows careerjet hosts; tighten it once the widget's real requests are known (check the browser console).
+
+## v39
+- Find jobs is now two steps (like Teal): 1) search (Careerjet box), 2) "Add the job here" (link + advert, title/company guessed) with fit score, save to tracker with the full description, tailor a CV copy, and start a cover letter from it.
+- "Save to CV ID" bookmarklet (desktop): sends the job page's link, title and text to the app via postMessage. Everything received is clipped and shown in the form for the person to check. Nothing goes to a server.
+- Find jobs is second in the menu and has a yellow search card on the dashboard.
+- Cover letters: input and preview are 50/50 on desktop; on phones a Write/Preview switch.
+- Phones: bottom tab bar (Home, Find jobs, Tracker, Resumes, More), compact top bar, shorter pages (long helper text hidden), 44px tap targets, 16px fields.
+
+## v40: hiring side (demo)
+- New "Hiring view" (app.html#hire): Candidates (search, sector chips, "fully verified only"), a profile page with Verified / Not yet verified items ("who checked it, how, when"), Ask to verify, Add to shortlist, Get in touch, notes; Shortlist board (Saved, Contacted, Interviewing, Hired). Job seeker side gets a Requests page that answers the demo asks (accept/decline contact, name a referee or document, badge flips to Verified).
+- Files: assets/hire.js (UCVHire), assets/hire-data.js (12 made-up sample candidates), CSS block "v40" in assets/shell.css, wiring in assets/pages.js and assets/app.js.
+- "Add a candidate" reads a pasted p.html share link in the browser (UCV.decode + fromShare). Imported items always show as not verified. All state lives in store.hire (localStorage). No server yet: real requests and real verification need a backend and an updated privacy policy.
+
+## v41: two-sided platform foundation (Wellfound-style, for Ireland)
+- Homepage is now an audience choice (candidates / companies) followed by what each gets and our Irish twist (checked facts, Irish sectors, explained ranking). New pages: candidates.html, employers.html. The old CV-checker homepage content lives on cv-checker.html and cv-builder.html.
+- App: Jobs board (assets/board.js + board-data.js): filters by county/sector/work style, pay always shown, company pages, one-step apply with CV ID profile (adds to the tracker). Company side: Post a job (pay range required), Applicants (ranked, reasons shown, stage select), Company page, plus Candidates and Shortlist from v40.
+- Demo data only, stored in localStorage (store.board, store.hire). Next: a backend (accounts, shared jobs, real requests, verification) and an updated privacy policy.
+- Pricing on employers.html shows only what exists (free jobs); Reach and Help hiring are labelled Planned with no price.
+
+## v42: recruiter workspace modelled on Wellfound Recruit
+- Company nav: Dashboard, Jobs (Active / Drafts), Applicants, Find talent, Messages, Pipeline, Company page. Phone bar: Jobs, Applicants, Find talent, Messages, switch.
+- Find talent: saved searches, Active / Passive tabs, candidate cards (experience, education and registration, ideal next job with pay), Share, Not interested, Request to chat.
+- Post a job: Save draft or Publish (pay range needed to publish), experience, right to work / permit, applicant questions.
+- Reference: Wellfound's own recruiter screens (Dashboard, Jobs, Applicants, Source, New Job form) looked at in a logged-in session on 19 Oct 2026. Structure and feature set only; all wording, design and data are ours.
