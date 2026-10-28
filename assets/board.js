@@ -35,7 +35,7 @@
       const list = jobs().filter(j => (B.county === 'All' || j.county === B.county) && (B.sector === 'All' || j.sector === B.sector) && (B.work === 'All' || j.work === B.work) && (!q || (j.title + ' ' + companyOf(j).name + ' ' + j.skills.join(' ') + ' ' + j.county).toLowerCase().indexOf(q) !== -1));
       const pf = (s.prefs || {}).roles;
       return `
-        <header class="pg-head"><div><p class="pg-date">Candidates</p><h1>Jobs</h1><p class="pg-sub">Every job shows its pay. Apply with your CV ID profile in one step.</p></div>
+        <header class="pg-head"><div><h1>Jobs</h1><p class="pg-sub">Every job shows its pay. Apply with your CV ID profile in one step.</p></div>
           <div class="pg-actions"><button class="btn" data-tab="find">Search other boards</button></div></header>
         <div class="hr-demo"><b>Demo</b><span>These jobs and companies are made up. Jobs posted from the company side appear here too, on this device only.</span></div>
         <div class="bd-filters">
@@ -94,10 +94,10 @@
     // ---------- company side: Post a job ----------
     function post() {
       const f = B.form, co = bs().company;
-      if (!co.name) return `<header class="pg-head"><div><p class="pg-date">Companies</p><h1>Post a job</h1></div></header>
+      if (!co.name) return `<header class="pg-head"><div><h1>Post a job</h1></div></header>
         <section class="pg-card"><h2>First, tell us about your company</h2><p class="hint">Candidates see this on every job you post. It takes a minute.</p><button class="btn btn-primary" data-tab="company">Set up company page</button></section>`;
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Post a job</h1><p class="pg-sub">Free during the beta. Add the pay range to publish, so candidates know before they apply.</p></div></header>
+        <header class="pg-head"><div><h1>Post a job</h1><p class="pg-sub">Free during the beta. Add the pay range to publish, so candidates know before they apply.</p></div></header>
         <form class="pg-card bd-form" id="bdPost" novalidate>
           <label class="field">Job title<input type="text" name="title" maxlength="100" value="${esc(f.title || '')}" placeholder="e.g. Staff Nurse, Medical Ward" required></label>
           <div class="grid-2"><label class="field">County<select name="county">${COUNTIES.map(c => `<option ${c === (f.county || co.county) ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
@@ -136,7 +136,7 @@
       const feed = (b.log || []).slice().reverse().slice(0, 6);
       const tile = (n, l) => `<div class="cd-t"><b>${n}</b><span>${l}</span></div>`;
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Hello${name ? ', ' + esc(name) : ''}</h1></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button><button class="btn" data-tab="hire">Find talent</button></div></header>
+        <header class="pg-head"><div><h1>Hello${name ? ', ' + esc(name) : ''}</h1></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button><button class="btn" data-tab="hire">Find talent</button></div></header>
         <div class="hr-demo"><b>Demo</b><span>Numbers here count what you do in this browser. Applicants are sample people.</span></div>
         <div class="pg-cols">
           <section class="pg-card"><div class="pg-card-top"><h2>Applicants</h2><span>Your jobs</span></div><div class="cd-row">${tile(live.length, 'live jobs')}${tile(apps, 'applicants')}${tile(Object.keys((b.stage || {})).length, 'moved on')}</div></section>
@@ -151,7 +151,7 @@
     function cjobs() {
       const b = bs(), act = b.posted.filter(j => !j.draft), dr = b.posted.filter(j => j.draft), list = B.jtab === 'draft' ? dr : act;
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Jobs</h1><p class="pg-sub">Free to post. Candidates see pay on every job.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">+ Post a job</button></div></header>
+        <header class="pg-head"><div><h1>Jobs</h1><p class="pg-sub">Free to post. Candidates see pay on every job.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">+ Post a job</button></div></header>
         <div class="pg-seg" role="tablist"><button type="button" role="tab" aria-selected="${B.jtab !== 'draft'}" data-action="pg-b-jtab" data-v="active">Active ${act.length}</button><button type="button" role="tab" aria-selected="${B.jtab === 'draft'}" data-action="pg-b-jtab" data-v="draft">Drafts ${dr.length}</button></div>
         ${list.length ? `<div class="bd-list" style="margin-top:16px">${list.map(j => `<div class="bd-app cj-row"><span></span><span class="bd-app-main"><b>${esc(j.title)}</b><i>${esc(j.county)} · ${esc(j.work)} · ${j.max ? esc(pay(j)) : 'No pay yet'}</i>${j.draft ? '' : `<span class="bd-why">${rank(j).length} applicants</span>`}</span><span></span>
           <span class="cj-act">${j.draft ? `<button class="btn btn-sm btn-primary" data-action="pg-b-edit" data-id="${esc(j.id)}">Edit and publish</button>` : `<button class="btn btn-sm" data-action="pg-b-pjob-go" data-id="${esc(j.id)}">Applicants</button>`}<button class="btn btn-sm btn-ghost" data-action="pg-b-del" data-id="${esc(j.id)}">Delete</button></span></div>`).join('')}</div>`
@@ -187,8 +187,8 @@
       return out.sort((a, b) => o[a.st] - o[b.st]);
     }
     function reqRow(r) {
-      const right = r.st === 'met' ? badge(r.level) : r.st === 'unproven' ? (r.asked ? '<span class="hint">Asked, waiting</span>' : `<button type="button" class="btn btn-sm" data-action="pg-h-ask" data-k="${esc(r.key)}">Ask for proof</button>`) : '<span class="hint">Not on their CV</span>';
-      const note = r.st === 'met' ? esc(r.via) : r.st === 'unproven' ? esc(r.via) + ' · ' + badge(0) : 'No match found';
+      const right = r.st === 'met' ? badge(r.level) : r.st === 'unproven' ? (r.asked ? '<span class="hint">Asked, waiting</span>' : `<button type="button" class="btn btn-sm" data-action="pg-h-ask" data-k="${esc(r.key)}">Ask for proof</button>`) : '<span class="rq-none">Not on their CV</span>';
+      const note = r.st === 'not' ? 'No match found' : r.st === 'unproven' ? esc(r.via) + ' ' + badge(0) : esc(r.via);
       return `<div class="rq rq-${r.st}"><span class="rq-t"><b>${esc(r.m)}</b><i>${note}</i></span>${right}</div>`;
     }
 
@@ -208,20 +208,20 @@
     }
     function pipeline() {
       const b = bs(), mine = b.posted.filter(j => !j.draft);
-      if (!mine.length && !B.sample) return `<header class="pg-head"><div><p class="pg-date">Companies</p><h1>Applicants</h1><p class="pg-sub">Jobs you post, and the people who apply.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button></div></header>
+      if (!mine.length && !B.sample) return `<header class="pg-head"><div><h1>Applicants</h1><p class="pg-sub">Jobs you post, and the people who apply.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button></div></header>
         <p class="empty">You have not posted a job yet.</p><p><button class="btn" data-action="pg-b-sample">See an example with sample applicants</button></p>`;
       const list = mine.length ? mine : [jobBy('j1')];
       const j = list.find(x => x.id === B.pjob) || list[0];
       const rows = rank(j);
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Applicants</h1><p class="pg-sub">Ranked by how well each CV fits the job. The reasons are shown, and you can change the stage.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button></div></header>
+        <header class="pg-head"><div><h1>Applicants</h1><p class="pg-sub">Ranked by how well each CV fits the job. The reasons are shown, and you can change the stage.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="post">Post a job</button></div></header>
         ${mine.length ? '' : '<div class="hr-demo"><b>Example</b><span>This is a sample job with made-up applicants. Post your own job to start.</span></div>'}
         <div class="hr-chips" role="group" aria-label="Job">${list.map(x => `<button type="button" class="hr-chip" data-action="pg-b-pjob" data-id="${esc(x.id)}" aria-pressed="${x.id === j.id}">${esc(x.title)}</button>`).join('')}</div>
         <p class="hint hr-count">${esc(j.title)} · ${esc(pay(j))} · ${rows.length} applicant${rows.length === 1 ? '' : 's'}${mine.length ? ' (sample people, to show how ranking works)' : ''}</p>
         <div class="bd-list">${rows.map((r, n) => { const st = b.stage[j.id + ':' + r.c.id] || 'Applied';
           return `<div class="bd-app"><span class="bd-rank">${n + 1}</span><button type="button" class="bd-app-main" data-action="pg-h-open" data-id="${esc(r.c.id)}"><b>${esc(r.c.name)}</b><i>${esc(r.c.role)} · ${esc(r.c.location)}</i>
             <span class="bd-why">Meets ${r.met} of ${r.n} must-haves · ${r.proven} backed by proof${r.niceN ? ' · ' + r.hasNice.length + ' of ' + r.niceN + ' other skills' : ''}${r.sector ? ' · Same sector' : ''}</span></button>
-            <span class="bd-score" title="Fit score">${r.score}<small>fit</small></span>
+            <span class="bd-score" title="Fit score: how well the CV matches the must-haves, other skills and sector">${r.score}<small>fit</small></span>
             <label class="field"><span class="sr-only">Stage for ${esc(r.c.name)}</span><select data-pg="b-stage" data-j="${esc(j.id)}" data-c="${esc(r.c.id)}">${STAGES.map(x => `<option ${x === st ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
             <div class="rq-list">${r.rq.slice(0, 3).map(reqRow).join('')}${r.rq.length > 3 ? `<p class="hint">${r.rq.length - 3} more must-have${r.rq.length - 3 === 1 ? '' : 's'} in their profile.</p>` : ''}</div></div>`; }).join('') || '<p class="empty">No sample applicants match this job.</p>'}</div>
         <p class="hint"><b>Proof levels:</b> 0 Self-declared · 1 Referee confirmed · 2 Employer or school confirmed · 3 Register matched. Only proof the system recorded is counted.</p>
@@ -232,7 +232,7 @@
     function company() {
       const c = bs().company;
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Company page</h1><p class="pg-sub">What candidates see on every job you post.</p></div>${c.name ? `<div class="pg-actions"><button class="btn" data-action="pg-b-co" data-id="mine">Preview</button></div>` : ''}</header>
+        <header class="pg-head"><div><h1>Company page</h1><p class="pg-sub">What candidates see on every job you post.</p></div>${c.name ? `<div class="pg-actions"><button class="btn" data-action="pg-b-co" data-id="mine">Preview</button></div>` : ''}</header>
         <section class="pg-card bd-form">
           <label class="field">Company name<input type="text" data-pg="b-co-name" maxlength="80" value="${esc(c.name)}" placeholder="e.g. Harbour Logistics"></label>
           <div class="grid-2"><label class="field">Sector<select data-pg="b-co-sector">${SECTORS.map(x => `<option ${x === c.sector ? 'selected' : ''}>${x}</option>`).join('')}</select></label>

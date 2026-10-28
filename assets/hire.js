@@ -63,7 +63,7 @@
       const nA = found.filter(isAct).length, nP = found.length - nA;
       const nSaved = Object.keys(h.saved).filter(k => h.saved[k]).length;
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Find talent</h1><p class="pg-sub">Search people who share a CV ID. A Verified badge means the fact was checked, and you can see who checked it.</p></div>
+        <header class="pg-head"><div><h1>Find talent</h1><p class="pg-sub">Search people who share a CV ID. A Verified badge means the fact was checked, and you can see who checked it.</p></div>
           <div class="pg-actions"><button class="btn btn-primary" data-action="pg-h-add">+ Add a candidate</button><button class="btn" data-tab="shortlist">Pipeline${nSaved ? ' (' + nSaved + ')' : ''}</button></div></header>
         <div class="hr-demo"><b>Demo</b><span>The people marked Sample are made up, so you can try the screens. To add a real person, paste the CV ID link they sent you.</span></div>
         ${V.adding ? addForm() : ''}
@@ -153,7 +153,7 @@
     function shortlist() {
       const h = hs(), list = everyone().map(decorate).filter(c => c.saved);
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Pipeline</h1><p class="pg-sub">The people you are talking to, by stage. Add notes on each profile.</p></div>
+        <header class="pg-head"><div><h1>Pipeline</h1><p class="pg-sub">The people you are talking to, by stage. Add notes on each profile.</p></div>
           <div class="pg-actions"><button class="btn btn-primary" data-tab="hire">Find talent</button></div></header>
         ${list.length ? `<div class="hr-board">${STAGES.map(st => { const col = list.filter(c => c.stage === st); return `<section class="hr-col" aria-label="${st}"><h2>${st}<span>${col.length}</span></h2>${col.map(c => `<div class="hr-sc"><button type="button" class="hr-sc-open" data-action="pg-h-open" data-id="${esc(c.id)}"><b>${esc(c.name)}</b><i>${esc(c.role)}</i>${badge(c)}</button><label class="field"><span class="sr-only">Stage for ${esc(c.name)}</span><select data-pg="h-stage" data-id="${esc(c.id)}">${STAGES.map(x => `<option ${x === c.stage ? 'selected' : ''}>${x}</option>`).join('')}</select></label><button class="btn btn-sm btn-ghost" data-action="pg-h-save" data-id="${esc(c.id)}">Remove</button></div>`).join('') || '<p class="hint">Empty</p>'}</section>`; }).join('')}</div>`
         : '<p class="empty">Nobody here yet. Open a candidate and choose Add to shortlist.</p>'}`;
@@ -168,7 +168,7 @@
       const contacts = all.filter(c => h.contacted[c.id] === 'sent');
       const done = all.filter(c => c.items.some(i => h.proof[i.k]) || h.contacted[c.id] === 'accepted' || h.contacted[c.id] === 'declined');
       return `
-        <header class="pg-head"><div><p class="pg-date">Job seeker</p><h1>Requests</h1><p class="pg-sub">When an employer wants to contact you, or check something on your CV, it lands here. You decide.</p></div></header>
+        <header class="pg-head"><div><h1>Requests</h1><p class="pg-sub">When an employer wants to contact you, or check something on your CV, it lands here. You decide.</p></div></header>
         <div class="hr-demo"><b>Demo</b><span>Real requests need an account, which is not built yet. Until then this shows what a candidate would see. Ask a Sample person a question in <a href="#hire" data-tab="hire">Candidates</a> and it appears here.</span></div>
         ${asks.length || contacts.length ? '' : '<p class="empty">No requests waiting.</p>'}
         ${contacts.map(c => `<section class="pg-card hr-req"><p class="hr-who">As ${esc(c.name)} (sample)</p><h2>An employer would like to get in touch</h2><p>They can see your verified profile. They only get your contact details if you say yes.</p><div class="ctrls"><button class="btn btn-primary" data-action="pg-h-reply" data-id="${esc(c.id)}" data-v="accepted">Yes, share my details</button><button class="btn" data-action="pg-h-reply" data-id="${esc(c.id)}" data-v="declined">Not now</button></div></section>`).join('')}
@@ -183,7 +183,7 @@
       const h = hs(), all = everyone();
       const rows = Object.keys(h.contacted).map(id => ({ c: all.find(x => x.id === id), st: h.contacted[id] })).filter(r => r.c);
       return `
-        <header class="pg-head"><div><p class="pg-date">Companies</p><h1>Messages</h1><p class="pg-sub">Chat requests you have sent, and how each person answered. Contact details appear only after a yes.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="hire">Find talent</button></div></header>
+        <header class="pg-head"><div><h1>Messages</h1><p class="pg-sub">Chat requests you have sent, and how each person answered. Contact details appear only after a yes.</p></div><div class="pg-actions"><button class="btn btn-primary" data-tab="hire">Find talent</button></div></header>
         ${rows.length ? `<div class="pg-list pg-card">${rows.map(r => `<button class="pg-row" data-action="pg-h-open" data-id="${esc(r.c.id)}"><span class="pg-dot ${r.st === 'accepted' ? 'ok' : r.st === 'declined' ? '' : 'warn'}"></span><span><b>${esc(r.c.name)}</b><i>${r.st === 'accepted' ? 'Said yes. You can now contact them.' : r.st === 'declined' ? 'Not now' : 'Waiting for their answer' + (r.c.sample ? ' (answer as them in Job seeker view, Requests)' : '')}</i></span><em>Open</em></button>`).join('')}</div>` : '<p class="empty">No chat requests yet. Open Find talent and choose Request to chat.</p>'}`;
     }
 

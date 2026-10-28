@@ -133,3 +133,12 @@ Careerjet's API refused our Worker (403, "Unauthorized access from IP", Cloudfla
 - **Fit score** now: up to 60 points for must-haves (full when something backs the claim, 60% when only claimed, 0 when missing), 25 for other skills, 15 for the same sector. The page explains it.
 - **Design tokens.** The hiring-side CSS no longer uses raw hex values; main buttons are night, lime marks one thing per view, labels are sentence case, radii sit on the scale. `DESIGN.md` now has a "Hiring side" section (proof badge, requirement row, applicant card).
 - Not built yet: real accounts and referee emails (needs the platform API, see `platform-api` in the earlier zip), proof levels 2 to 4 from real sources.
+
+## v44: craft pass
+
+From the Taste, Impeccable and Emil Kowalski skill sets (see the design fixes spreadsheet):
+- Requirement rows are flat list rows with a small status pill; colour only on the pill. The old amber, red and green row fills are gone.
+- Fit score is a right-aligned figure with the reasons beside it, not a circle. Tabular numbers across the app.
+- Labels above page titles ("Companies", "Job seeker", "Candidates") removed, and the small uppercase kickers and the hero pill on the homepage, candidates and companies pages.
+- Buttons press with `scale(0.97)`; the card lift on the homepage picker is gone; `::selection` and reduced-motion rules added.
+- Bug fix: 11 rules used an undefined `--body` font variable, so their declarations were ignored. They now use `--font`.

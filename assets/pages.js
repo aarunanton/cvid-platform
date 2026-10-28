@@ -407,7 +407,7 @@
       const cands = evidence(L);
       const b = letterBody(L);
       return `
-        <header class="pg-head"><div><p class="pg-date">Cover letters</p><h1>${esc((L.role || 'Cover letter') + (L.company ? ', ' + L.company : ''))}</h1></div>
+        <header class="pg-head"><div><h1>${esc((L.role || 'Cover letter') + (L.company ? ', ' + L.company : ''))}</h1></div>
           <div class="pg-actions"><button class="btn" data-action="pg-letter-copy">Copy text</button><button class="btn btn-primary" data-action="pg-letter-pdf">Download PDF</button></div></header>
         <div class="pg-tabs">${ls.map(chip).join('')}<button class="pg-tab pg-tab-add" data-action="pg-letter-add">+ New letter</button></div>
         <div class="pg-seg only-mob" role="group" aria-label="Letter view"><button data-action="pg-lt-view" data-v="edit" aria-pressed="${C.view !== 'prev'}">Write</button><button data-action="pg-lt-view" data-v="prev" aria-pressed="${C.view === 'prev'}">Preview</button></div>
