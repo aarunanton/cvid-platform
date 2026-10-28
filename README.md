@@ -10,7 +10,7 @@ Publish: repo Settings > Pages > Deploy from branch main, root. Careerjet search
 
 Import your CV or build it here, and get a permanent Universal CV ID (for example `#UCVID-K7Q4M`). Keep one master CV, tick what each job needs, check it against the advert, and send a matching PDF, Word file, link or QR code. Everything runs in the browser: no account, no server, no tracking.
 
-**Live site:** https://cvid.app
+**Live site:** https://aarunanton.github.io/cvid-platform/
 
 ---
 
