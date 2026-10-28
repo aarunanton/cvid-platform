@@ -124,3 +124,12 @@ Careerjet's API refused our Worker (403, "Unauthorized access from IP", Cloudfla
 - Find talent: saved searches, Active / Passive tabs, candidate cards (experience, education and registration, ideal next job with pay), Share, Not interested, Request to chat.
 - Post a job: Save draft or Publish (pay range needed to publish), experience, right to work / permit, applicant questions.
 - Reference: Wellfound's own recruiter screens (Dashboard, Jobs, Applicants, Source, New Job form) looked at in a logged-in session on 19 Oct 2026. Structure and feature set only; all wording, design and data are ours.
+
+
+## v43: requirements with proof, and the hiring side on design tokens
+
+- **Must-haves.** Post a job with up to 5 must-haves (one per line), separate from "other skills that help". Sample jobs have must-haves too.
+- **Applicants show each must-have as met, unproven or not met**, with a proof badge (Level 0 self-declared, 1 referee confirmed, 2 employer or school confirmed, 3 register matched). Unproven ones have an **Ask for proof** button. The request lands in the job seeker's Requests page; once they name a referee the badge becomes Level 1. Demo data only, kept in this browser.
+- **Fit score** now: up to 60 points for must-haves (full when something backs the claim, 60% when only claimed, 0 when missing), 25 for other skills, 15 for the same sector. The page explains it.
+- **Design tokens.** The hiring-side CSS no longer uses raw hex values; main buttons are night, lime marks one thing per view, labels are sentence case, radii sit on the scale. `DESIGN.md` now has a "Hiring side" section (proof badge, requirement row, applicant card).
+- Not built yet: real accounts and referee emails (needs the platform API, see `platform-api` in the earlier zip), proof levels 2 to 4 from real sources.

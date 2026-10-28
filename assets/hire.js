@@ -164,6 +164,7 @@
       const h = hs(), all = samples();
       const asks = [];
       all.forEach(c => c.items.forEach(i => { if (h.asked[i.k] && !h.proof[i.k]) asks.push({ c, i }); }));
+      Object.keys(h.asked).forEach(k => { const m = k.match(/^(c\d+)-s-(.+)$/); if (!m || h.proof[k]) return; const c = all.find(x => x.id === m[1]); const sk = c && c.skills.find(x => x.toLowerCase().replace(/[^a-z0-9]+/g, '-') === m[2]); if (sk) asks.push({ c, i: { k, t: sk, s: 'A skill on your CV' } }); });
       const contacts = all.filter(c => h.contacted[c.id] === 'sent');
       const done = all.filter(c => c.items.some(i => h.proof[i.k]) || h.contacted[c.id] === 'accepted' || h.contacted[c.id] === 'declined');
       return `

@@ -24,7 +24,8 @@
 
     // how much of a job's skill list shows up in my CV
     function myText() { const cv = ctx.cv(); return [cv.basics.label, cv.basics.summary].concat(cv.skills || [], (cv.work || []).map(w => w.position + ' ' + (w.highlights || []).join(' ')), (cv.certificates || []).map(c => c.name)).join(' ').toLowerCase(); }
-    const fitMine = j => { const t = myText(); const has = j.skills.filter(s => t.indexOf(s.toLowerCase()) !== -1); return { has, miss: j.skills.filter(s => has.indexOf(s) === -1) }; };
+    const allSk = j => musts(j).concat(nice(j));
+    const fitMine = j => { const t = myText(); const sk = allSk(j); const has = sk.filter(s => t.indexOf(s.toLowerCase()) !== -1); return { has, miss: sk.filter(s => has.indexOf(s) === -1) }; };
 
     // ---------- candidate side: Jobs ----------
     function jobsPage() {
@@ -64,9 +65,11 @@
           ${applied ? `<div class="hr-note ok"><b>You applied.</b> It is in your <a href="#tracker" data-tab="tracker">Job tracker</a>. Status: ${esc(applied.status || 'Applied')}.</div>`
             : B.apply ? applyForm(j, name) : `<div class="ctrls"><button class="btn btn-primary" data-action="pg-b-apply">Apply with my CV ID</button><button class="btn" data-action="pg-b-save" data-id="${esc(j.id)}">Save to tracker</button></div>`}
           <h2 class="hr-h">About the job</h2><p>${esc(j.about || '')}</p>
-          <h2 class="hr-h">Skills they ask for</h2>
-          <p class="hr-skills">${j.skills.map(x => `<span${f.has.indexOf(x) !== -1 ? ' class="on"' : ''}>${f.has.indexOf(x) !== -1 ? '✓ ' : ''}${esc(x)}</span>`).join('')}</p>
-          <p class="hint">Your CV mentions ${f.has.length} of ${j.skills.length}.${f.miss.length ? ' Not yet shown: ' + esc(f.miss.join(', ')) + '.' : ''}</p>
+          <h2 class="hr-h">Must-haves</h2>
+          <p class="hr-skills">${musts(j).map(x => `<span${f.has.indexOf(x) !== -1 ? ' class="on"' : ''}>${f.has.indexOf(x) !== -1 ? '✓ ' : ''}${esc(x)}</span>`).join('')}</p>
+          <p class="hint">What they need to see to shortlist you. Your CV mentions ${f.has.length} of ${allSk(j).length} of the skills listed here.${f.miss.length ? ' Not yet shown: ' + esc(f.miss.join(', ')) + '.' : ''}</p>
+          ${nice(j).length ? `<h2 class="hr-h">Other skills that help</h2>
+          <p class="hr-skills">${nice(j).map(x => `<span${f.has.indexOf(x) !== -1 ? ' class="on"' : ''}>${f.has.indexOf(x) !== -1 ? '✓ ' : ''}${esc(x)}</span>`).join('')}</p>` : ''}
           <h2 class="hr-h">About ${esc(c.name)}</h2><p>${esc(c.about || 'No description yet.')}</p>
         </section>`;
     }
@@ -105,7 +108,8 @@
             <label class="field">Pay up to (€ a year)<input type="number" name="max" min="1000" step="500" value="${esc(f.max || '')}" placeholder="55000" required></label></div>
           <div class="grid-2"><label class="field">Experience<select name="exp">${['Any', 'Entry level', '1–3 years', '3–5 years', '5+ years'].map(c => `<option ${c === f.exp ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
             <label class="field">Right to work<select name="permit">${['Must already have the right to work in Ireland', 'Willing to sponsor a work permit'].map(c => `<option ${c === f.permit ? 'selected' : ''}>${c}</option>`).join('')}</select></label></div>
-          <label class="field">Skills and requirements (comma separated)<input type="text" name="skills" maxlength="300" value="${esc(f.skills || '')}" placeholder="e.g. Patient assessment, IV therapy, NMBI registration"></label>
+          <label class="field">Must-haves (up to 5, one per line)<textarea name="must" rows="4" maxlength="400" placeholder="e.g. NMBI registration&#10;IV therapy&#10;Right to work in Ireland">${esc(f.must || '')}</textarea><span class="hint">What the person needs for you to shortlist them. We show you which ones each applicant meets, and how well each is backed up.</span></label>
+          <label class="field">Other skills that help (comma separated, optional)<input type="text" name="skills" maxlength="300" value="${esc(f.skills || '')}" placeholder="e.g. Care planning, Mentoring"></label>
           <label class="field">About the job<textarea name="about" rows="5" maxlength="2000" placeholder="What will they do, and who will they work with?">${esc(f.about || '')}</textarea></label>
           <label class="field">Questions for applicants (optional, one per line, up to 3)<textarea name="qs" rows="3" maxlength="600" placeholder="Do you have the right to work in Ireland?">${esc(f.qs || '')}</textarea></label>
           ${B.err ? `<p class="hr-err" role="alert">${esc(B.err)}</p>` : ''}
@@ -114,11 +118,11 @@
     }
     function publish(fd, draft) {
       const g = k => String(fd.get(k) || '').trim();
-      const f = B.form = { title: g('title'), county: g('county'), work: g('work'), sector: g('sector'), type: g('type'), min: g('min'), max: g('max'), exp: g('exp'), permit: g('permit'), skills: g('skills'), about: g('about'), qs: g('qs') };
+      const f = B.form = { title: g('title'), county: g('county'), work: g('work'), sector: g('sector'), type: g('type'), min: g('min'), max: g('max'), exp: g('exp'), permit: g('permit'), skills: g('skills'), must: g('must'), about: g('about'), qs: g('qs') };
       const min = Math.round(+f.min), max = Math.round(+f.max);
       if (!f.title) { B.err = 'Add a job title.'; return false; }
       if (!draft && (!(min >= 1000) || !(max >= min))) { B.err = 'Add the pay range to publish. The top figure must be at least the bottom one. You can also save a draft.'; return false; }
-      const job = { id: B.editing || ctx.uid('j'), co: 'mine', draft: !!draft, title: cap(f.title, 100), county: COUNTIES.includes(f.county) ? f.county : 'Dublin', work: WORK.includes(f.work) ? f.work : 'On-site', type: ['Full-time', 'Part-time', 'Contract'].includes(f.type) ? f.type : 'Full-time', sector: SECTORS.includes(f.sector) ? f.sector : 'Other', min: min >= 0 ? min : 0, max: max >= 0 ? max : 0, exp: cap(f.exp, 20), permit: cap(f.permit, 60), skills: f.skills.split(/[,\n]/).map(x => cap(x.trim(), 50)).filter(Boolean).slice(0, 12), about: cap(f.about, 2000), qs: f.qs.split('\n').map(x => cap(x.trim(), 200)).filter(Boolean).slice(0, 3), posted: 'Today' };
+      const job = { id: B.editing || ctx.uid('j'), co: 'mine', draft: !!draft, title: cap(f.title, 100), county: COUNTIES.includes(f.county) ? f.county : 'Dublin', work: WORK.includes(f.work) ? f.work : 'On-site', type: ['Full-time', 'Part-time', 'Contract'].includes(f.type) ? f.type : 'Full-time', sector: SECTORS.includes(f.sector) ? f.sector : 'Other', min: min >= 0 ? min : 0, max: max >= 0 ? max : 0, exp: cap(f.exp, 20), permit: cap(f.permit, 60), must: String(f.must || '').split('\n').map(x => cap(x.trim(), 80)).filter(Boolean).slice(0, 5), skills: f.skills.split(/[,\n]/).map(x => cap(x.trim(), 50)).filter(Boolean).slice(0, 12), about: cap(f.about, 2000), qs: f.qs.split('\n').map(x => cap(x.trim(), 200)).filter(Boolean).slice(0, 3), posted: 'Today' };
       const b = bs(), i = b.posted.findIndex(x => x.id === job.id);
       if (i >= 0) b.posted[i] = job; else b.posted.unshift(job);
       b.log = (b.log || []).concat({ t: new Date().toISOString(), m: (draft ? 'Saved draft: ' : 'Published: ') + job.title }).slice(-30);
@@ -154,17 +158,53 @@
         : `<section class="pg-card" style="margin-top:16px"><h2>${B.jtab === 'draft' ? 'No drafts' : 'No jobs yet'}</h2><p class="pg-sub">You do not need to post a job to start reaching out to candidates.</p><div class="ctrls"><button class="btn btn-primary" data-tab="post">Post a job</button><button class="btn" data-tab="hire">Find talent</button></div></section>`}`;
     }
 
+// ---------- must-haves and proof ----------
+    const MUST = { j1: ['SolidWorks', 'GD&T', 'BEng Mechanical Engineering'], j2: ['Registered General Nurse', 'Critical care', 'IV therapy'], j3: ['Month-end close', 'Budgeting', 'ACCA member'], j4: ['Programme planning', 'Health and safety', 'Safe Pass'], j5: ['Validation', 'GMP', 'Root cause analysis'], j6: ['Kitchen management', 'Food costing', 'HACCP'], j7: ['TypeScript', 'React', 'Node.js'], j8: ['Musculoskeletal', 'Registered Physiotherapist', 'Rehab programmes'], j9: ['ISO 13485', 'CAPA', 'Risk management'], j10: ['Registered General Nurse', 'Patient assessment', 'IV therapy'] };
+    const musts = j => (j.must && j.must.length) ? j.must : (MUST[j.id] || j.skills.slice(0, 3));
+    const nice = j => { const m = musts(j).map(x => x.toLowerCase()); return j.skills.filter(x => m.indexOf(x.toLowerCase()) === -1); };
+    const PL = ['Self-declared', 'Referee confirmed', 'Employer or school confirmed', 'Register matched', 'Signed credential'];
+    const stem = w => w.length > 5 ? w.slice(0, 5) : w;
+    const slug = t => String(t).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const hit = (phrase, text) => { const p = String(phrase).toLowerCase().trim(); if (!p) return false; if (text.indexOf(p) !== -1) return true; const ws = p.split(/[^a-z0-9+#.]+/).filter(w => w.length > 2); return ws.length > 0 && ws.every(w => text.indexOf(stem(w)) !== -1); };
+    const badge = lv => `<span class="pb pb-${lv}">Level ${lv}: ${esc(PL[lv])}</span>`;
+    // How strong is the proof behind one claim on a sample CV? Only what the system recorded is counted.
+    function itemLevel(c, i, n, h) {
+      if ((h.proof || {})[c.id + '-' + n]) return 1;
+      if (!i[2]) return 0;
+      if (i[1].indexOf('–') !== -1 || /^(BEng|BSc|BComm|MEng|MPharm|Higher Certificate|Advanced Certificate)/.test(i[0])) return 2;
+      return 3;
+    }
+    function reqs(j, c) {
+      const h = ctx.store().hire || {};
+      const out = musts(j).map(m => {
+        let best = null;
+        c.items.forEach((i, n) => { if (hit(m, (i[0] + ' ' + i[1]).toLowerCase())) { const lv = itemLevel(c, i, n, h); if (!best || lv > best.level) best = { level: lv, key: c.id + '-' + n, via: i[1] || i[0] }; } });
+        if (!best) { const sk = c.skills.find(x => hit(m, x.toLowerCase())); if (sk) { const key = c.id + '-s-' + slug(sk); best = { level: (h.proof || {})[key] ? 1 : 0, key, via: 'Skill on their CV' }; } }
+        const st = !best ? 'not' : best.level === 0 ? 'unproven' : 'met';
+        return { m, st, level: best ? best.level : 0, key: best ? best.key : '', via: best ? best.via : '', asked: !!(best && (h.asked || {})[best.key]) };
+      });
+      const o = { not: 0, unproven: 1, met: 2 };
+      return out.sort((a, b) => o[a.st] - o[b.st]);
+    }
+    function reqRow(r) {
+      const right = r.st === 'met' ? badge(r.level) : r.st === 'unproven' ? (r.asked ? '<span class="hint">Asked, waiting</span>' : `<button type="button" class="btn btn-sm" data-action="pg-h-ask" data-k="${esc(r.key)}">Ask for proof</button>`) : '<span class="hint">Not on their CV</span>';
+      const note = r.st === 'met' ? esc(r.via) : r.st === 'unproven' ? esc(r.via) + ' · ' + badge(0) : 'No match found';
+      return `<div class="rq rq-${r.st}"><span class="rq-t"><b>${esc(r.m)}</b><i>${note}</i></span>${right}</div>`;
+    }
+
     // ---------- company side: Applicants ----------
     function rank(j) {
-      const h = (ctx.store().hire || {});
+      const mu = musts(j), ni = nice(j);
       return (window.UCV_SAMPLES || []).map(c => {
+        const rq = reqs(j, c);
         const text = (c.role + ' ' + c.skills.join(' ') + ' ' + c.items.map(i => i[0]).join(' ')).toLowerCase();
-        const has = j.skills.filter(s => text.indexOf(s.toLowerCase()) !== -1), miss = j.skills.filter(s => has.indexOf(s) === -1);
-        const nv = c.items.filter((i, n) => i[2] || (h.proof || {})[c.id + '-' + n]).length;
+        const hasNice = ni.filter(x => hit(x, text));
+        const met = rq.filter(r => r.st !== 'not').length, proven = rq.filter(r => r.st === 'met').length;
         const sector = c.sector === j.sector ? 15 : 0;
-        const score = Math.round((j.skills.length ? has.length / j.skills.length : 0) * 70 + (c.items.length ? nv / c.items.length : 0) * 15 + sector);
-        return { c, has, miss, nv, score, sector: !!sector };
-      }).filter(r => r.has.length || r.sector).sort((a, b) => b.score - a.score).slice(0, 8);
+        const pts = rq.reduce((a, r) => a + (r.st === 'met' ? 1 : r.st === 'unproven' ? 0.6 : 0), 0);
+        const score = Math.round((mu.length ? pts / mu.length : 0) * 60 + (ni.length ? hasNice.length / ni.length : 0) * 25 + sector);
+        return { c, rq, met, proven, n: mu.length, hasNice, niceN: ni.length, score, sector: !!sector };
+      }).filter(r => r.met || r.sector).sort((a, b) => b.score - a.score).slice(0, 8);
     }
     function pipeline() {
       const b = bs(), mine = b.posted.filter(j => !j.draft);
@@ -180,10 +220,12 @@
         <p class="hint hr-count">${esc(j.title)} · ${esc(pay(j))} · ${rows.length} applicant${rows.length === 1 ? '' : 's'}${mine.length ? ' (sample people, to show how ranking works)' : ''}</p>
         <div class="bd-list">${rows.map((r, n) => { const st = b.stage[j.id + ':' + r.c.id] || 'Applied';
           return `<div class="bd-app"><span class="bd-rank">${n + 1}</span><button type="button" class="bd-app-main" data-action="pg-h-open" data-id="${esc(r.c.id)}"><b>${esc(r.c.name)}</b><i>${esc(r.c.role)} · ${esc(r.c.location)}</i>
-            <span class="bd-why">${r.has.length ? 'Matches ' + esc(r.has.join(', ')) : 'No listed skills matched'}${r.miss.length ? ' · Missing ' + esc(r.miss.join(', ')) : ''}${r.sector ? ' · Same sector' : ''} · ${r.nv} of ${r.c.items.length} verified</span></button>
+            <span class="bd-why">Meets ${r.met} of ${r.n} must-haves · ${r.proven} backed by proof${r.niceN ? ' · ' + r.hasNice.length + ' of ' + r.niceN + ' other skills' : ''}${r.sector ? ' · Same sector' : ''}</span></button>
             <span class="bd-score" title="Fit score">${r.score}<small>fit</small></span>
-            <label class="field"><span class="sr-only">Stage for ${esc(r.c.name)}</span><select data-pg="b-stage" data-j="${esc(j.id)}" data-c="${esc(r.c.id)}">${STAGES.map(x => `<option ${x === st ? 'selected' : ''}>${x}</option>`).join('')}</select></label></div>`; }).join('') || '<p class="empty">No sample applicants match this job.</p>'}</div>
-        <p class="hint">How the fit score works: up to 70 points for skills on the job that appear on the CV, 15 for verified items, 15 for the same sector. Nothing else is used.</p>`;
+            <label class="field"><span class="sr-only">Stage for ${esc(r.c.name)}</span><select data-pg="b-stage" data-j="${esc(j.id)}" data-c="${esc(r.c.id)}">${STAGES.map(x => `<option ${x === st ? 'selected' : ''}>${x}</option>`).join('')}</select></label>
+            <div class="rq-list">${r.rq.slice(0, 3).map(reqRow).join('')}${r.rq.length > 3 ? `<p class="hint">${r.rq.length - 3} more must-have${r.rq.length - 3 === 1 ? '' : 's'} in their profile.</p>` : ''}</div></div>`; }).join('') || '<p class="empty">No sample applicants match this job.</p>'}</div>
+        <p class="hint"><b>Proof levels:</b> 0 Self-declared · 1 Referee confirmed · 2 Employer or school confirmed · 3 Register matched. Only proof the system recorded is counted.</p>
+        <p class="hint">How the fit score works: up to 60 points for the must-haves (full points when something backs the claim, 60% when it is only claimed, nothing when it is missing), 25 for the other skills, 15 for the same sector. Nothing else is used.</p>`;
     }
 
     // ---------- company side: profile ----------
@@ -220,7 +262,7 @@
         case 'pg-b-pjob': B.pjob = d.id; ctx.rerender(); break;
         case 'pg-b-pjob-go': B.pjob = d.id; ctx.go('pipeline'); break;
         case 'pg-b-jtab': B.jtab = d.v; ctx.rerender(); break;
-        case 'pg-b-edit': { const j = b.posted.find(x => x.id === d.id); if (!j) break; B.editing = j.id; B.form = { title: j.title, county: j.county, work: j.work, sector: j.sector, type: j.type, min: j.min || '', max: j.max || '', exp: j.exp, permit: j.permit, skills: j.skills.join(', '), about: j.about, qs: (j.qs || []).join('\n') }; ctx.go('post'); break; }
+        case 'pg-b-edit': { const j = b.posted.find(x => x.id === d.id); if (!j) break; B.editing = j.id; B.form = { title: j.title, county: j.county, work: j.work, sector: j.sector, type: j.type, min: j.min || '', max: j.max || '', exp: j.exp, permit: j.permit, skills: j.skills.join(', '), must: (j.must || []).join('\n'), about: j.about, qs: (j.qs || []).join('\n') }; ctx.go('post'); break; }
         case 'pg-b-del': ctx.armed(btn, 'Click again to delete', () => { b.posted = b.posted.filter(x => x.id !== d.id); ctx.persist(); ctx.rerender(); }); break;
         case 'pg-b-sample': B.sample = true; ctx.rerender(); break;
       }
