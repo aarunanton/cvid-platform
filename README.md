@@ -142,3 +142,20 @@ From the Taste, Impeccable and Emil Kowalski skill sets (see the design fixes sp
 - Labels above page titles ("Companies", "Job seeker", "Candidates") removed, and the small uppercase kickers and the hero pill on the homepage, candidates and companies pages.
 - Buttons press with `scale(0.97)`; the card lift on the homepage picker is gone; `::selection` and reduced-motion rules added.
 - Bug fix: 11 rules used an undefined `--body` font variable, so their declarations were ignored. They now use `--font`.
+
+## v45: the road (shared application status)
+
+One application record that both sides read. The hiring team works in its own stages; each stage shows the candidate a plain status.
+
+- **Jobs list:** every job shows a count for each stage, plus flags for people waiting over 7 days and closing messages not sent.
+- **Pipeline page** (was Applicants): Candidates, Overview and Numbers. Candidates has a board (drag a card between columns) and the ranked list from v43.
+- **Quick-screen drawer:** open a card to see must-haves with proof, skills and history, move to the next stage, or step to the next applicant. Escape closes it.
+- **Stages and what the candidate sees:** Applied → Received, Screening → In review, Shortlisted → Shortlisted, Interview → Interview, Offer → Offer, Hired → Hired, Not progressing → Closed.
+- **Closing is held back.** Moving someone to Not progressing changes nothing for the candidate until the hiring team picks a reason (kept internal) and sends the closing message. The candidate sees "Closed" and a generic message, never the reason.
+- **Candidate side:** "Your applications" on the Jobs page with the live status and a New update flag, a progress line and timeline on the job, an unread badge on Jobs, and the Job tracker stage kept in step.
+- **You as an applicant:** apply to a job you posted on this device and you appear in its pipeline, marked You. Asking you for proof lands in your Requests.
+- The old Pipeline page under Find talent is now called Shortlist.
+
+To try the loop: For companies → Company page → Post a job. Switch to job seeker → Jobs → apply. Switch back → Jobs → Open pipeline → move yourself. Switch to job seeker again.
+
+Demo limits: one browser plays both sides, sample applicants are made up, and no message is really sent. Real accounts need the platform API.

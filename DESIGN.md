@@ -568,6 +568,14 @@ A job lists must-haves. On an applicant, each must-have is a row inside a panel:
 - Filters sit in a collapsible panel above the list on phones, and in a left rail on desktop.
 - Status changes (Applied, Interview, Hired, Declined) always say whether the candidate was told. A change that notifies the candidate shows "Candidate will be told" as an info tag before it is confirmed.
 
+### Pipeline and shared status (v45)
+
+- **Board:** one column per stage on `surface-2`, radius 16. Under each heading, one line says what the candidate sees. Cards are white with a hairline, radius 10: name, fit score, role, one line on must-haves and proof. Warnings (waiting, closing message not sent) are `warn` text, not filled chips.
+- **Quick-screen drawer:** 520px from the right, hairline left border, no shadow, over a 32% night scrim. Enters in 220ms with `cubic-bezier(0.23, 1, 0.32, 1)`; no motion when reduced motion is on. One primary button: the next stage.
+- **Status pill (what the candidate sees):** neutral for Received and In review, `info` soft for Shortlisted and Interview, `good` soft for Offer and Hired, neutral with `ink-3` for Closed. Never red: a closed application is not an error.
+- **Closing:** the reason field always says it is for the team's records only. The candidate copy never gives a reason.
+- **Stage counts on a job row:** figures in the display face, labels in `ink-3`, zero counts in `ink-3` regular weight so the non-zero ones stand out.
+
 ## Content and tone
 - Write for someone who is nervous about their CV. Short sentences, everyday words, second person ("your CV").
 - Say what happens next before it happens ("We read your CV on this device. Nothing is uploaded.").

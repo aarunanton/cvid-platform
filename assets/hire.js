@@ -1,4 +1,4 @@
-/* Universal CV ID — Hiring side (v40)
+/* Universal CV ID — Hiring side (v45)
    Pages for someone who is hiring: Candidates, a candidate's profile, Shortlist; plus the job seeker's Requests inbox.
    Today everything is kept in this browser. The 12 sample people are made up. A real candidate is added by pasting
    the CV ID link they shared; nothing is sent anywhere. Real two-way requests need a server (not built yet). */
@@ -30,6 +30,8 @@
       }));
     }
     const everyone = () => real().concat(samples());
+    // the person using this browser, once they have applied to a job here
+    function meAsSample() { const bd = ctx.board && ctx.board(); if (!bd || !bd.applied()) return []; const c = bd.me(); return [{ id: 'me', me: true, sample: false, name: c.name, role: c.role, location: c.location, sector: '', skills: c.skills, items: c.items.map((i, n) => ({ t: i[0], s: i[1], v: false, k: 'me-' + n, n })) }]; }
     function decorate(c) {
       const h = hs();
       const items = c.items.map(i => {
@@ -64,7 +66,7 @@
       const nSaved = Object.keys(h.saved).filter(k => h.saved[k]).length;
       return `
         <header class="pg-head"><div><h1>Find talent</h1><p class="pg-sub">Search people who share a CV ID. A Verified badge means the fact was checked, and you can see who checked it.</p></div>
-          <div class="pg-actions"><button class="btn btn-primary" data-action="pg-h-add">+ Add a candidate</button><button class="btn" data-tab="shortlist">Pipeline${nSaved ? ' (' + nSaved + ')' : ''}</button></div></header>
+          <div class="pg-actions"><button class="btn btn-primary" data-action="pg-h-add">+ Add a candidate</button><button class="btn" data-tab="shortlist">Shortlist${nSaved ? ' (' + nSaved + ')' : ''}</button></div></header>
         <div class="hr-demo"><b>Demo</b><span>The people marked Sample are made up, so you can try the screens. To add a real person, paste the CV ID link they sent you.</span></div>
         ${V.adding ? addForm() : ''}
         <div class="ft-wrap">
@@ -153,7 +155,7 @@
     function shortlist() {
       const h = hs(), list = everyone().map(decorate).filter(c => c.saved);
       return `
-        <header class="pg-head"><div><h1>Pipeline</h1><p class="pg-sub">The people you are talking to, by stage. Add notes on each profile.</p></div>
+        <header class="pg-head"><div><h1>Shortlist</h1><p class="pg-sub">People you found and saved, by stage. Add notes on each profile.</p></div>
           <div class="pg-actions"><button class="btn btn-primary" data-tab="hire">Find talent</button></div></header>
         ${list.length ? `<div class="hr-board">${STAGES.map(st => { const col = list.filter(c => c.stage === st); return `<section class="hr-col" aria-label="${st}"><h2>${st}<span>${col.length}</span></h2>${col.map(c => `<div class="hr-sc"><button type="button" class="hr-sc-open" data-action="pg-h-open" data-id="${esc(c.id)}"><b>${esc(c.name)}</b><i>${esc(c.role)}</i>${badge(c)}</button><label class="field"><span class="sr-only">Stage for ${esc(c.name)}</span><select data-pg="h-stage" data-id="${esc(c.id)}">${STAGES.map(x => `<option ${x === c.stage ? 'selected' : ''}>${x}</option>`).join('')}</select></label><button class="btn btn-sm btn-ghost" data-action="pg-h-save" data-id="${esc(c.id)}">Remove</button></div>`).join('') || '<p class="hint">Empty</p>'}</section>`; }).join('')}</div>`
         : '<p class="empty">Nobody here yet. Open a candidate and choose Add to shortlist.</p>'}`;
@@ -161,10 +163,10 @@
 
     // ---------- the job seeker's inbox (demo) ----------
     function requests() {
-      const h = hs(), all = samples();
+      const h = hs(), all = samples().concat(meAsSample());
       const asks = [];
       all.forEach(c => c.items.forEach(i => { if (h.asked[i.k] && !h.proof[i.k]) asks.push({ c, i }); }));
-      Object.keys(h.asked).forEach(k => { const m = k.match(/^(c\d+)-s-(.+)$/); if (!m || h.proof[k]) return; const c = all.find(x => x.id === m[1]); const sk = c && c.skills.find(x => x.toLowerCase().replace(/[^a-z0-9]+/g, '-') === m[2]); if (sk) asks.push({ c, i: { k, t: sk, s: 'A skill on your CV' } }); });
+      Object.keys(h.asked).forEach(k => { const m = k.match(/^(c\d+|me)-s-(.+)$/); if (!m || h.proof[k]) return; const c = all.find(x => x.id === m[1]); const sk = c && c.skills.find(x => x.toLowerCase().replace(/[^a-z0-9]+/g, '-') === m[2]); if (sk) asks.push({ c, i: { k, t: sk, s: 'A skill on your CV' } }); });
       const contacts = all.filter(c => h.contacted[c.id] === 'sent');
       const done = all.filter(c => c.items.some(i => h.proof[i.k]) || h.contacted[c.id] === 'accepted' || h.contacted[c.id] === 'declined');
       return `
@@ -172,7 +174,7 @@
         <div class="hr-demo"><b>Demo</b><span>Real requests need an account, which is not built yet. Until then this shows what a candidate would see. Ask a Sample person a question in <a href="#hire" data-tab="hire">Candidates</a> and it appears here.</span></div>
         ${asks.length || contacts.length ? '' : '<p class="empty">No requests waiting.</p>'}
         ${contacts.map(c => `<section class="pg-card hr-req"><p class="hr-who">As ${esc(c.name)} (sample)</p><h2>An employer would like to get in touch</h2><p>They can see your verified profile. They only get your contact details if you say yes.</p><div class="ctrls"><button class="btn btn-primary" data-action="pg-h-reply" data-id="${esc(c.id)}" data-v="accepted">Yes, share my details</button><button class="btn" data-action="pg-h-reply" data-id="${esc(c.id)}" data-v="declined">Not now</button></div></section>`).join('')}
-        ${asks.map(({ c, i }) => `<section class="pg-card hr-req"><p class="hr-who">As ${esc(c.name)} (sample)</p><h2>Please confirm one thing on your CV</h2><p><b>${esc(i.t)}</b><br><span class="hint">${esc(i.s)}</span></p><p class="hint">Name someone who can confirm it, or attach a document. Either way, the employer will see who checked it.</p>
+        ${asks.map(({ c, i }) => `<section class="pg-card hr-req"><p class="hr-who">${c.me ? 'For you' : 'As ' + esc(c.name) + ' (sample)'}</p><h2>Please confirm one thing on your CV</h2><p><b>${esc(i.t)}</b><br><span class="hint">${esc(i.s)}</span></p><p class="hint">Name someone who can confirm it, or attach a document. Either way, the employer will see who checked it.</p>
           <div class="grid-2"><label class="field">Referee name and email<input type="text" data-pg="h-ref" data-k="${esc(i.k)}" placeholder="e.g. Sinéad Walsh, sinead@example.com"></label><label class="field">Or document name<input type="text" data-pg="h-doc" data-k="${esc(i.k)}" placeholder="e.g. Safe Pass card.pdf"></label></div>
           <div class="ctrls"><button class="btn btn-primary" data-action="pg-h-confirm" data-k="${esc(i.k)}">Send for checking</button></div></section>`).join('')}
         ${done.length ? `<section class="pg-card"><div class="pg-card-top"><h2>Answered</h2><button class="btn btn-sm btn-ghost" data-action="pg-h-reset">Reset demo</button></div><div class="pg-list">${done.map(c => `<div class="pg-row"><span class="pg-dot ok"></span><span><b>${esc(c.name)}</b><i>${h.contacted[c.id] === 'declined' ? 'Contact declined' : h.contacted[c.id] === 'accepted' ? 'Contact accepted' : 'Check sent'}</i></span></div>`).join('')}</div></section>` : ''}`;
@@ -236,6 +238,6 @@
       return true;
     }
     function submit() { return false; }
-    return { render: { hire, shortlist, requests, messages }, click, field, submit, pending: () => { const h = hs(); let n = 0; samples().forEach(c => { if (h.contacted[c.id] === 'sent') n++; c.items.forEach(i => { if (h.asked[i.k] && !h.proof[i.k]) n++; }); }); return n; }, reset: () => { V.open = ''; V.item = ''; V.adding = false; } };
+    return { render: { hire, shortlist, requests, messages }, click, field, submit, pending: () => { const h = hs(); let n = 0; samples().concat(meAsSample()).forEach(c => { if (h.contacted[c.id] === 'sent') n++; c.items.forEach(i => { if (h.asked[i.k] && !h.proof[i.k]) n++; }); }); return n; }, reset: () => { V.open = ''; V.item = ''; V.adding = false; } };
   };
 })();

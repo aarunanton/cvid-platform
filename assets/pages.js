@@ -46,7 +46,7 @@
     swap: '<path d="M7 7h12l-3-3M17 17H5l3 3"/>'
   };
   const NAV = [['home', 'Dashboard'], ['jobs', 'Jobs'], ['find', 'Find jobs'], ['tracker', 'Job tracker'], ['resumes', 'Resumes'], ['cover', 'Cover letters'], ['contacts', 'Contacts'], ['requests', 'Requests'], ['interviews', 'Interviews'], ['resources', 'Resources']];
-  const NAVH = [['cdash', 'Dashboard'], ['cjobs', 'Jobs'], ['pipeline', 'Applicants'], ['hire', 'Find talent'], ['cmsg', 'Messages'], ['shortlist', 'Pipeline'], ['company', 'Company page']];
+  const NAVH = [['cdash', 'Dashboard'], ['cjobs', 'Jobs'], ['pipeline', 'Pipeline'], ['hire', 'Find talent'], ['cmsg', 'Messages'], ['shortlist', 'Shortlist'], ['company', 'Company page']];
   const HIRING = NAVH.map(n => n[0]).concat('post');
   const BARH = ['cjobs', 'pipeline', 'hire', 'cmsg'];
   const BAR = [['home', 'Home'], ['jobs', 'Jobs'], ['tracker', 'Tracker'], ['resumes', 'Resumes']]; // phone bottom bar; the rest sit under More
@@ -78,6 +78,7 @@
     // ---------- navigation ----------
     const H = window.UCVHire ? window.UCVHire(ctx) : null;
     const BD = window.UCVBoard ? window.UCVBoard(ctx) : null;
+    ctx.board = () => BD;
     function side(tab) {
       const s = ctx.store();
       if (HIRING.includes(tab)) {
@@ -95,7 +96,8 @@
         </div>`;
       }
       const pend = H ? H.pending() : 0;
-      const badge = id => id === 'tracker' && s.applications.length ? `<span class="sd-badge">${s.applications.length}</span>` : id === 'requests' && pend ? `<span class="sd-badge">${pend}</span>` : '';
+      const upd = BD ? BD.unread() : 0;
+      const badge = id => id === 'jobs' && upd ? `<span class="sd-badge">${upd}</span>` : id === 'tracker' && s.applications.length ? `<span class="sd-badge">${s.applications.length}</span>` : id === 'requests' && pend ? `<span class="sd-badge">${pend}</span>` : '';
       const link = (id, label) => `<a href="#${id}" class="sd-link" data-tab="${id}"${tab === id || (id === 'resumes' && tab === 'versions') ? ' aria-current="page"' : ''}><svg viewBox="0 0 24 24" aria-hidden="true">${IC[id]}</svg><span>${label}</span>${badge(id)}</a>`;
       return `
         <a class="sd-brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span><span>Universal CV ID</span></a>
